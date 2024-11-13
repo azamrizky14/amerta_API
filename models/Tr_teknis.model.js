@@ -22,6 +22,15 @@ const Tr_teknisSchema = mongoose.Schema({
         type: Map,
         of: String, // The key will be the image field name, and the value will be the filename
     },
+    Tr_teknis_trouble: {
+        type: String,
+    },
+    Tr_teknis_action: {
+        type: String,
+    },
+    Tr_teknis_pelanggan_server: {
+        type: String,
+    },
     Tr_teknis_keterangan: {
         type: String
     },
