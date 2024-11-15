@@ -1,18 +1,29 @@
 const Tr_teknis = require("../models/Tr_teknis.model");
 
 // GET BY DOMAIN
-const getTrTeknis = async(req, res) => {
+const getTrTeknis = async (req, res) => {
     try {
-        const TrTeknis = await Tr_teknis.find({ Tr_teknis_domain: req.params.domain, Tr_teknis_status: req.params.status, Tr_teknis_jenis: req.params.type });
+        const { domain, deleted, type } = req.params;
+
+        // Create a filter object dynamically
+        const filter = { Tr_teknis_domain: domain };
+
+        // Add optional filters if provided
+        if (deleted) filter.Tr_teknis_deleted = deleted;
+        if (type) filter.Tr_teknis_jenis = type;
+
+        // Fetch the data based on the dynamic filter
+        const TrTeknis = await Tr_teknis.find(filter);
+
+        // Check if any data was found
         if (TrTeknis.length > 0) {
-            res.status(200).json(TrTeknis);
-
+            return res.status(200).json(TrTeknis);
         } else {
-            res.status(404).json(Pesan = "DATA KOSONG");
-
+            return res.status(404).json({ message: "DATA KOSONG" });
         }
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error fetching data:', error);
+        return res.status(500).json({ message: error.message });
     }
 };
 
@@ -297,6 +308,46 @@ const updateTrTeknis = async(req, res) => {
     }
 };
 
+// GET BON PREFIX
+
+const getBonPrefix = async (req, res) => {
+    try {
+      const { type, date } = req.params;
+  
+      // Buat prefix berdasarkan parameter `type` dan `date`
+      const prefix = `${type}/${date}`;
+  
+      // Cari semua dokumen yang memiliki prefix sesuai di database
+      const data = await Tr_teknis.find({
+        Tr_teknis_logistik_id: { $regex: `^${prefix}` }
+      });
+  
+      // Jika tidak ada data dengan prefix tersebut, kembalikan ID pertama dengan angka '001'
+      if (data.length === 0) {
+        return res.json({ nextId: `${prefix}/001` });
+      }
+  
+      // Cari ID dengan angka terbesar dari hasil query
+      const latestId = data.reduce((maxId, currentItem) => {
+        const currentNumber = parseInt(currentItem.Tr_teknis_logistik_id.split("/").pop() || "0");
+        const maxNumber = parseInt(maxId.split("/").pop() || "0");
+        return currentNumber > maxNumber ? currentItem.Tr_teknis_logistik_id : maxId;
+      }, "");
+      
+      // Ambil angka dari ID terbaru dan tambahkan 1
+      const latestNumber = parseInt(latestId.split("/").pop() || "0");
+      const nextNumber = (latestNumber + 1).toString().padStart(3, "0");
+  
+      // Gabungkan prefix dengan angka yang baru
+      const nextId = `${prefix}/${nextNumber}`;
+  
+      // Kembalikan hasilnya
+      res.json({ nextId });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
 
 
 
@@ -308,5 +359,6 @@ module.exports = {
     createTrTeknis,
     createTrTeknisGambar,
     updateTrTeknis,
-    updateTrTeknisGambar
+    updateTrTeknisGambar,
+    getBonPrefix
 };
