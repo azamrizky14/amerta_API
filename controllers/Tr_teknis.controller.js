@@ -3,7 +3,7 @@ const Tr_teknis = require("../models/Tr_teknis.model");
 // GET BY DOMAIN
 const getTrTeknis = async (req, res) => {
     try {
-        const { domain, deleted, type } = req.params;
+        const { domain, deleted, type, status } = req.params;
 
         // Create a filter object dynamically
         const filter = { Tr_teknis_domain: domain };
@@ -11,6 +11,7 @@ const getTrTeknis = async (req, res) => {
         // Add optional filters if provided
         if (deleted) filter.Tr_teknis_deleted = deleted;
         if (type) filter.Tr_teknis_jenis = type;
+        if (status) filter.Tr_teknis_status = status;
 
         // Fetch the data based on the dynamic filter
         const TrTeknis = await Tr_teknis.find(filter);
@@ -182,6 +183,146 @@ const createTrTeknisGambar = async (req, res) => {
     }
 };
 
+const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
+    try {
+      // Destructure the relevant fields from the request body
+      const { 
+        Tr_teknis_logistik_id, 
+        Tr_teknis_work_order_terpakai_material, 
+        Tr_teknis_jenis, 
+
+        Tr_teknis_pelanggan_id,
+        Tr_teknis_pelanggan_nama,
+        Tr_teknis_pelanggan_server,
+        Tr_teknis_user_updated,
+        Tr_teknis_keterangan,
+        Tr_teknis_created,
+        Tr_teknis_tanggal,
+        ...dynamicFields // All other fields will be collected here
+      } = req.body;
+  
+      // Ensure Tr_teknis_work_order_terpakai_material is parsed correctly
+      let materialTerpakai = [];
+      if (Tr_teknis_work_order_terpakai_material) {
+        if (typeof Tr_teknis_work_order_terpakai_material === 'string') {
+          // If it's a string, parse it as JSON
+          materialTerpakai = JSON.parse(Tr_teknis_work_order_terpakai_material);
+        } else if (Array.isArray(Tr_teknis_work_order_terpakai_material)) {
+          // If it's already an array, use it as-is
+          materialTerpakai = Tr_teknis_work_order_terpakai_material;
+        }
+      }
+  
+      // Define image fields based on Tr_teknis_jenis
+      const imageFieldMapping = {
+        PSB: [
+          'Tr_teknis_evident_progress',
+          'Tr_teknis_evident_odp_depan',
+          'Tr_teknis_evident_odp_dalam',
+          'Tr_teknis_evident_redaman_ont',
+          'Tr_teknis_evident_redaman_odp',
+          'Tr_teknis_evident_marking_dc_start',
+          'Tr_teknis_evident_marking_dc_end',
+          'Tr_teknis_evident_kertas_psb',
+          'Tr_teknis_evident_review_google',
+          'Tr_teknis_evident_speed_test',
+          'Tr_teknis_evident_pelanggan_dengan_pelanggan',
+          'Tr_teknis_evident_pelanggan_depan_rumah'
+        ],
+        MT: [
+          'Tr_teknis_redaman_sebelum',
+          'Tr_teknis_evident_kendala_1',
+          'Tr_teknis_evident_kendala_2',
+          'Tr_teknis_evident_kendala_3',
+          'Tr_teknis_evident_proses_sambung',
+          'Tr_teknis_redaman_sesudah',
+          'Tr_teknis_redaman_out_odp',
+          'Tr_teknis_redaman_pelanggan',
+          'Tr_teknis_evident_marking_dc_start',
+          'Tr_teknis_evident_marking_dc_end'
+        ],
+        INFRA: [
+          'Tr_teknis_redaman_sebelum',
+          'Tr_teknis_evident_kendala_1',
+          'Tr_teknis_evident_kendala_2',
+          'Tr_teknis_evident_kendala_3',
+          'Tr_teknis_evident_proses_sambung',
+          'Tr_teknis_redaman_sesudah',
+          'Tr_teknis_redaman_out_odp',
+          'Tr_teknis_redaman_pelanggan',
+          'Tr_teknis_evident_marking_dc_start',
+          'Tr_teknis_evident_marking_dc_end'
+        ]
+      };
+  
+      const imageFields = imageFieldMapping[Tr_teknis_jenis];
+      if (!imageFields) {
+        return res.status(400).json({ message: "Invalid Tr_teknis_jenis value" });
+      }
+  
+      // Initialize the Tr_teknis_images object with default empty strings
+      const Tr_teknis_images = Object.fromEntries(
+        imageFields.map(field => [field, ""])
+      );
+  
+      // Populate Tr_teknis_images based on uploaded files
+      if (req.files && req.files.length > 0) {
+        req.files.forEach(file => {
+          const { fieldname, filename } = file;
+          if (imageFields.includes(fieldname)) {
+            Tr_teknis_images[fieldname] = filename;
+          }
+        });
+      }
+  
+      // Check if each field in imageFields is present in the request and if it has a file
+      imageFields.forEach(field => {
+        if (!req.files || !req.files.some(file => file.fieldname === field)) {
+          // If no file is uploaded for the field, set it to empty string
+          Tr_teknis_images[field] = "";
+        }
+      });
+  
+      // Find the record by Tr_teknis_logistik_id
+      const existingData = await Tr_teknis.findOne({ Tr_teknis_logistik_id });
+      if (!existingData) {
+        return res.status(404).json({ message: "Record not found" });
+      }
+  
+      // Prepare the data to be saved inside the Tr_teknis_work_order_terpakai field
+      const workOrderData = {
+        Tr_teknis_pelanggan_id,
+        Tr_teknis_pelanggan_nama,
+        Tr_teknis_pelanggan_server,
+        Tr_teknis_user_updated,
+        Tr_teknis_keterangan,
+        Tr_teknis_created,
+        Tr_teknis_tanggal,
+        Tr_teknis_logistik_id,
+        Tr_teknis_work_order_terpakai_material: materialTerpakai,
+        Tr_teknis_work_order_images: Tr_teknis_images
+      };
+  
+      // Add other fields to the data to be updated using dynamicFields
+      const updatedData = {
+        ...existingData.toObject(), // Preserve existing data
+        ...dynamicFields, // Add all dynamic fields passed in the request
+        Tr_teknis_work_order_terpakai: [...existingData.Tr_teknis_work_order_terpakai, workOrderData] // Add the new work order data
+      };
+  
+      // Save the updated data
+      const updatedRecord = await Tr_teknis.findByIdAndUpdate(existingData._id, updatedData, { new: true });
+  
+      // Send back a success response
+      res.status(200).json({ message: "Data updated successfully", updatedData: updatedRecord });
+    } catch (error) {
+      console.error("Error during data update:", error);
+      res.status(500).json({ message: "An error occurred while updating data" });
+    }
+  };
+  
+  
+  
 const updateTrTeknisGambar = async (req, res) => {
     try {
         const { _id, Tr_teknis_jenis, ...dynamicFields } = req.body;
@@ -358,6 +499,7 @@ module.exports = {
     getTrTeknisById,
     createTrTeknis,
     createTrTeknisGambar,
+    updateTrTeknisWorkOrderTerpakai,
     updateTrTeknis,
     updateTrTeknisGambar,
     getBonPrefix

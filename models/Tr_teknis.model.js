@@ -17,10 +17,10 @@ const Tr_teknisSchema = mongoose.Schema({
     Tr_teknis_deleted: {
         type: String,
     },
-    Ty_teknis_item: {
+    Tr_teknis_item: {
         type: String,
     },
-    Ty_teknis_keterangan: {
+    Tr_teknis_keterangan: {
         type: String,
     },
     // New field for images
