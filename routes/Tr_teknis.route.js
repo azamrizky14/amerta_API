@@ -8,6 +8,7 @@ const {
     getTrTeknisById,
     createTrTeknis,
     createTrTeknisGambar,
+    updateTrTeknisWorkOrderTerpakai,
     updateTrTeknis,
     updateTrTeknisGambar,
     getBonPrefix
@@ -26,7 +27,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
     // ----
 
-router.get("/Trteknis/getdata/:domain/:deleted?/:type?", getTrTeknis);
+router.get("/Trteknis/getdata/:domain/:deleted?/:type?/:status?", getTrTeknis);
 router.get("/Trteknis/getbyid/:id", getTrTeknisById);
 router.get("/Trteknis/getBonPrefix/:type/:date", getBonPrefix);
 
@@ -36,6 +37,7 @@ router.post("/Trteknis/createimage", upload.any(), createTrTeknisGambar);
 // update a product
 router.put("/Trteknis/updatebyid/:id", updateTrTeknis);
 router.put("/Trteknis/updateImageById/:id", upload.any(), updateTrTeknisGambar);
+router.put("/Trteknis/updateWorkOrder", upload.any(), updateTrTeknisWorkOrderTerpakai);
 
 
 
