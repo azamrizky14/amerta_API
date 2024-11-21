@@ -28,6 +28,37 @@ const getTrTeknis = async (req, res) => {
     }
 };
 
+// GET BY DOMAIN
+const getTrTeknisEvident = async (req, res) => {
+    try {
+        const { domain, deleted, type, status } = req.params;
+
+        // Create a filter object dynamically
+        const filter = { Tr_teknis_domain: domain };
+
+        // Add optional filters if provided
+        if (deleted) filter.Tr_teknis_deleted = deleted;
+        if (type) filter.Tr_teknis_jenis = type;
+        if (status) filter.Tr_teknis_status = status;
+
+        // Fetch the data based on the dynamic filter
+        const TrTeknis = await Tr_teknis.find(filter);
+
+        // Check if any data was found
+        if (TrTeknis.length > 0) {
+            // Use flatMap to combine all Tr_teknis_work_order_terpakai into a single array
+            const combinedResult = TrTeknis.flatMap(item => item.Tr_teknis_work_order_terpakai || []);
+
+            return res.status(200).json(combinedResult);
+        } else {
+            return res.status(404).json({ message: "DATA KOSONG" });
+        }
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return res.status(500).json({ message: error.message });
+    }
+};
+
 
 // FIND ONE BY ID
 const getTrTeknisById = async(req, res) => {
@@ -496,6 +527,7 @@ const getBonPrefix = async (req, res) => {
 
 module.exports = {
     getTrTeknis,
+    getTrTeknisEvident,
     getTrTeknisById,
     createTrTeknis,
     createTrTeknisGambar,
