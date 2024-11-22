@@ -6,6 +6,7 @@ const router = express.Router();
 const {
     getTrTeknis,
     getTrTeknisById,
+    getTrTeknisEvidentById,
     createTrTeknis,
     createTrTeknisGambar,
     updateTrTeknisWorkOrderTerpakai,
@@ -31,6 +32,7 @@ const upload = multer({ storage: storage })
 router.get("/Trteknis/getdata/:domain/:deleted?/:type?/:status?", getTrTeknis);
 router.get("/Trteknis/getdataEvident/:domain/:deleted?/:type?/:status?", getTrTeknisEvident);
 router.get("/Trteknis/getbyid/:id", getTrTeknisById);
+router.get("/Trteknis/getEvidentbyid/:logistikType/:logistikdate/:logistikNumber/:id", getTrTeknisEvidentById);
 router.get("/Trteknis/getBonPrefix/:type/:date", getBonPrefix);
 
 router.post("/Trteknis/create", createTrTeknis);

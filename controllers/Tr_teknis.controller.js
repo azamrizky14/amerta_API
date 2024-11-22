@@ -1,4 +1,5 @@
 const Tr_teknis = require("../models/Tr_teknis.model");
+const mongoose = require('mongoose');
 
 // GET BY DOMAIN
 const getTrTeknis = async (req, res) => {
@@ -70,6 +71,43 @@ const getTrTeknisById = async(req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+const getTrTeknisEvidentById = async (req, res) => {
+  try {
+    const { logistikType, logistikdate, logistikNumber, id } = req.params;
+
+    // Construct the full logistik_id
+    const logistik_id = `${logistikType}/${logistikdate}/${logistikNumber}`;
+
+    // Convert id to ObjectId if it's not already an ObjectId
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    // Find the document by the logistik_id and the ObjectId of the item in Tr_teknis_work_order_terpakai
+    const TrTeknis = await Tr_teknis.findOne({
+      Tr_teknis_logistik_id: logistik_id,
+      "Tr_teknis_work_order_terpakai._id": objectId
+    });
+
+    if (!TrTeknis) {
+      return res.status(404).json({ message: "Data not found" });
+    }
+
+    // Find the specific item in the Tr_teknis_work_order_terpakai array by its ObjectId
+    const workOrderItem = TrTeknis.Tr_teknis_work_order_terpakai.find(item =>
+      item._id.toString() === objectId.toString()
+    );
+
+    if (!workOrderItem) {
+      return res.status(404).json({ message: "Work order item not found" });
+    }
+
+    // Send back the specific work order item if found
+    res.status(200).json(workOrderItem);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 // CREATE 
 const createTrTeknis = async(req, res) => {
@@ -322,6 +360,7 @@ const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
   
       // Prepare the data to be saved inside the Tr_teknis_work_order_terpakai field
       const workOrderData = {
+        _id: new mongoose.Types.ObjectId(), // Generate a new ObjectId
         Tr_teknis_pelanggan_id,
         Tr_teknis_pelanggan_nama,
         Tr_teknis_pelanggan_server,
@@ -351,8 +390,7 @@ const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
       res.status(500).json({ message: "An error occurred while updating data" });
     }
   };
-  
-  
+
   
 const updateTrTeknisGambar = async (req, res) => {
     try {
@@ -529,6 +567,7 @@ module.exports = {
     getTrTeknis,
     getTrTeknisEvident,
     getTrTeknisById,
+    getTrTeknisEvidentById,
     createTrTeknis,
     createTrTeknisGambar,
     updateTrTeknisWorkOrderTerpakai,
