@@ -19,7 +19,8 @@ const getTrTeknis = async (req, res) => {
 
         // Check if any data was found
         if (TrTeknis.length > 0) {
-            return res.status(200).json(TrTeknis);
+          const reversedData = TrTeknis.reverse();
+          return res.status(200).json(reversedData);
         } else {
             return res.status(404).json({ message: "DATA KOSONG" });
         }
@@ -50,7 +51,8 @@ const getTrTeknisEvident = async (req, res) => {
             // Use flatMap to combine all Tr_teknis_work_order_terpakai into a single array
             const combinedResult = TrTeknis.flatMap(item => item.Tr_teknis_work_order_terpakai || []);
 
-            return res.status(200).json(combinedResult);
+            const reversedData = combinedResult.reverse();
+            return res.status(200).json(reversedData);
         } else {
             return res.status(404).json({ message: "DATA KOSONG" });
         }
@@ -79,10 +81,10 @@ const getTrTeknisEvidentById = async (req, res) => {
     // Construct the full logistik_id
     const logistik_id = `${logistikType}/${logistikdate}/${logistikNumber}`;
 
-    // Convert id to ObjectId if it's not already an ObjectId
+    // Convert id to ObjectId
     const objectId = new mongoose.Types.ObjectId(id);
 
-    // Find the document by the logistik_id and the ObjectId of the item in Tr_teknis_work_order_terpakai
+    // Query the document
     const TrTeknis = await Tr_teknis.findOne({
       Tr_teknis_logistik_id: logistik_id,
       "Tr_teknis_work_order_terpakai._id": objectId
@@ -92,20 +94,24 @@ const getTrTeknisEvidentById = async (req, res) => {
       return res.status(404).json({ message: "Data not found" });
     }
 
-    // Find the specific item in the Tr_teknis_work_order_terpakai array by its ObjectId
-    let workOrderItem = TrTeknis.Tr_teknis_work_order_terpakai.find(item =>
+    // Find the specific item within Tr_teknis_work_order_terpakai array
+    const workOrderItem = TrTeknis.Tr_teknis_work_order_terpakai.find(item =>
       item._id.toString() === objectId.toString()
     );
-
-    // workOrderItem.Tr_teknis_team = TrTeknis.Tr_teknis_team
-    const newData = {...TrTeknis._doc, ...workOrderItem}
 
     if (!workOrderItem) {
       return res.status(404).json({ message: "Work order item not found" });
     }
 
-    // Send back the specific work order item if found
-    res.status(200).json(newData);
+    // Prepare response object
+    const responseData = {
+      ...workOrderItem,
+      Tr_teknis_logistik_id: TrTeknis.Tr_teknis_logistik_id,
+      Tr_teknis_team: TrTeknis.Tr_teknis_team
+    };
+
+    // Send the extracted work order item with related fields
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -461,9 +467,6 @@ const updateTrTeknisGambar = async (req, res) => {
 
         // Convert the Map to an object
         const existingImages = Object.fromEntries(existingData.Tr_teknis_images);
-
-        console.log('before', existingData);
-        console.log('existing images', existingImages);
 
         // Merge the existing images with the updated ones
         const updatedImages = { ...existingImages };
