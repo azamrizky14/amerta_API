@@ -56,7 +56,7 @@ const LoginAuth = async(req, res) => {
                     const dtkubody = req.body;
                     bcrypt.compare(req.body.password, user[0].Auth_password, (err, result) => {
                         if (result) {
-                            console.log(req.Session)
+                            // console.log(req.Session)
                             const token = jwt.sign(dtkubody, jwtKey, { algorithm: 'HS256' })
                             const hasil = user[0]
                             return res.status(200).json({
