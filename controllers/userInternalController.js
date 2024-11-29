@@ -255,7 +255,7 @@ async function listByCompanyCode(req, res) {
 
     // Retrieve all companies that match the criteria, as plain JavaScript objects
     const userInternal = await UserInternal.find(query).lean();
-    console.log('ini user internal', userInternal);
+    // console.log('ini user internal', userInternal);
 
     // Remove 'userImage' property from each object in the result array
     const finalUser = userInternal.map(({ userImage, ...rest }) => rest);

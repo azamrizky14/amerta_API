@@ -23,6 +23,9 @@ const Tr_teknisSchema = mongoose.Schema({
     Tr_teknis_keterangan: {
         type: String,
     },
+    Tr_teknis_keterangan_closing: {
+        type: String,
+    },
     // New field for images
     // Tr_teknis_images: {
     //     type: Map,
