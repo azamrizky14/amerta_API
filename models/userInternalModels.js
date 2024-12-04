@@ -10,6 +10,9 @@ const userInternalSchema = new mongoose.Schema({
     type: Array,
     require: true
   },
+  companyName: {
+    type: String
+  },
   userName: {
     type: String,
     required: [true, "Please enter your name"],

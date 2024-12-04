@@ -107,7 +107,6 @@ const getTrTeknisEvidentById = async (req, res) => {
     const responseData = {
       ...workOrderItem,
       Tr_teknis_logistik_id: TrTeknis.Tr_teknis_logistik_id,
-      Tr_teknis_team: TrTeknis.Tr_teknis_team
     };
 
     // Send the extracted work order item with related fields
@@ -264,12 +263,14 @@ const createTrTeknisGambar = async (req, res) => {
 const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
     try {
       // Destructure the relevant fields from the request body
-      const { 
+      let { 
         Tr_teknis_logistik_id, 
         Tr_teknis_work_order_terpakai_material, 
         Tr_teknis_jenis, 
+        Tr_teknis_kategori, 
         Tr_teknis_trouble,
         Tr_teknis_action,
+        Tr_teknis_team,
 
         Tr_teknis_pelanggan_id,
         Tr_teknis_pelanggan_nama,
@@ -335,9 +336,9 @@ const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
         ]
       };
   
-      const imageFields = imageFieldMapping[Tr_teknis_jenis];
+      const imageFields = imageFieldMapping[Tr_teknis_kategori];
       if (!imageFields) {
-        return res.status(400).json({ message: "Invalid Tr_teknis_jenis value" });
+        return res.status(400).json({ message: "Invalid Tr_teknis_kategori value" });
       }
   
       // Initialize the Tr_teknis_images object with default empty strings
@@ -368,11 +369,15 @@ const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
       if (!existingData) {
         return res.status(404).json({ message: "Record not found" });
       }
+      if (Tr_teknis_team) {
+        Tr_teknis_team = JSON.parse(Tr_teknis_team)
+      }
   
       // Prepare the data to be saved inside the Tr_teknis_work_order_terpakai field
       const workOrderData = {
         _id: new mongoose.Types.ObjectId(), // Generate a new ObjectId
         Tr_teknis_pelanggan_id,
+        Tr_teknis_kategori,
         Tr_teknis_pelanggan_nama,
         Tr_teknis_pelanggan_server,
         Tr_teknis_user_updated,
@@ -380,11 +385,12 @@ const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
         Tr_teknis_created,
         Tr_teknis_tanggal,
         Tr_teknis_logistik_id,
+        Tr_teknis_team,
         Tr_teknis_work_order_terpakai_material: materialTerpakai,
         Tr_teknis_work_order_images: Tr_teknis_images
       };
 
-      if (Tr_teknis_jenis === "MT"){
+      if (Tr_teknis_kategori === "MT"){
         workOrderData.Tr_teknis_trouble= Tr_teknis_trouble, 
         workOrderData.Tr_teknis_action= Tr_teknis_action
       }
