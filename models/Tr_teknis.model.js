@@ -21,7 +21,7 @@ const Tr_teknisSchema = mongoose.Schema({
         type: String,
     },
     Tr_teknis_keterangan: {
-        type: String,
+        type: String,   
     },
     Tr_teknis_keterangan_closing: {
         type: String,
@@ -60,7 +60,7 @@ const Tr_teknisSchema = mongoose.Schema({
     },
     Tr_teknis_jenis: {
         type: String,
-        enum: ["PSB", "MT", "INFRA"],
+        // enum: ["PSB", "MT", "INFRA"],
     },
     Tr_teknis_work_order_tersedia: {
         type: Array,

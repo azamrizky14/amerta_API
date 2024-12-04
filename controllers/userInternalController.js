@@ -25,6 +25,19 @@ async function getAllUsers(req, res) {
   }
 }
 
+// Controller method to get all users
+async function getUserByRole(req, res) {
+  try {
+    const { companyName, userRole } = req.params;
+    // Retrieve all users from the database
+    const users = await UserInternal.find({ isDeleted: false, userRole: userRole, companyName: companyName });
+    res.json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 // Controller method to get user data by ID
 async function getUserById(req, res) {
   try {
@@ -204,6 +217,15 @@ async function loginUser(req, res) {
       return res.status(401).json({ message: "Email belum terdaftar!" });
     }
 
+    // // Generate a bcrypt hash
+    // bcrypt.hash(password, 10, (err, hash) => {
+    //   if (err) {
+    //     console.error('Error hashing password:', err);
+    //   } else {
+    //     console.log('Generated bcrypt hash:', hash);
+    //   }
+    // });
+
     // Compare the provided password with the hashed password in the database
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -217,6 +239,7 @@ async function loginUser(req, res) {
       userName: user.userName,
       userRole: user.userRole,
       companyCode: user.companyCode,
+      companyName: user.companyName,
       companyPage: user.companyPage,
       userAccStatus: user.userAccStatus,
       hierarchyCode: user.hierarchyCode,
@@ -279,6 +302,7 @@ module.exports = {
   updateUser,
   updateUserOne,
   getUserById,
+  getUserByRole,
 
   listByCompanyCode
   // Add more controller methods as needed
