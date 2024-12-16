@@ -24,8 +24,10 @@
     const Tr_closing = require("./routes/Tr_closing.route.js")
     const Tr_teknis = require("./routes/Tr_teknis.route.js");
 
+    // Tambahan
     const userInternal = require("./routes/userInternalRoutes.js");
     const utilities = require("./routes/utilitiesRoutes.js");
+    const Item = require("./routes/itemRoutes.js");
     const cors = require("cors")
     const path = require("path");
 
@@ -64,6 +66,7 @@
     // Tambahan
     app.use("/api/userInternal", userInternal)
     app.use("/api/utilities", utilities)
+    app.use("/api/item", Item);
 
 
 
