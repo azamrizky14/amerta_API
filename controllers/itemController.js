@@ -1,8 +1,16 @@
-const Item = require("../models/Master_item.model.js");
+const Item = require("../models/itemModels.js");
 // GET BY DOMAIN
 const getMasterItem = async (req, res) => {
   try {
-    const MasterItem = await Item.find({ item_domain: req.params.domain, item_status: "Y" });
+    const { domain, deleted } = req.params;
+
+    // Create a filter object dynamically
+    const filter = { companyName: domain };
+
+    // Add optional filters if provided
+    if (deleted) filter.item_deleted = deleted;
+
+    const MasterItem = await Item.find(filter);
     res.status(200).json(MasterItem);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -50,16 +58,34 @@ const createMasterItem = async (req, res) => {
 // TRIAL CREATE WITH GAMBAR 
 const createMasterItemGambar = async (req, res) => {
   try {
-    // const { item_nama, item_stok, item_domain, item_harga, item_created, item_updated, item_user_updated, item_status, item_satuan, item_history, item_list, item_qc_item_history_pemakaian_kabel, item_gambar } = req.body;
     const { item_gambar, ...dynamicFields } = req.body;
-    const newData = new Item({ ...dynamicFields, item_gambar: req.file.filename });
-    await newData.save()
-    res.status(201).json({ message: 'Gambar sudah terupload' });
+
+    const newData = new Item({
+      ...dynamicFields,
+      item_gambar: ""
+    });
+
+    try {
+      newData.item_bundle = JSON.parse(newData.item_bundle);
+      newData.item_harga = JSON.parse(newData.item_harga);
+      newData.item_konversi = JSON.parse(newData.item_konversi);
+    } catch (error) {
+      console.error('Error parsing JSON fields:', error);
+      throw new Error('Invalid JSON format in input');
+    }
+
+    if (req.file) {
+      newData.item_gambar = req.file.filename;
+    }
+    newData.item_detail = {item_detail_stock: []}
+    await newData.save();
+    res.status(201).json({ message: 'Data Item Tersimpan' });
   } catch (error) {
     console.error('Gagal menyimpan data', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Create existing item untuk penambahan stok dll 
 const createMasterItemExisting = async (req, res) => {

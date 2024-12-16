@@ -12,6 +12,7 @@ const {
     updateTrTeknisWorkOrderTerpakai,
     updateTrTeknis,
     updateTrTeknisGambar,
+    updateTrTeknisEvidentById,
     getBonPrefix,
     getTrTeknisEvident
 } = require('../controllers/Tr_teknis.controller.js');
@@ -42,6 +43,7 @@ router.post("/Trteknis/createimage", upload.any(), createTrTeknisGambar);
 router.put("/Trteknis/updatebyid/:id", updateTrTeknis);
 router.put("/Trteknis/updateImageById/:id", upload.any(), updateTrTeknisGambar);
 router.put("/Trteknis/updateWorkOrder", upload.any(), updateTrTeknisWorkOrderTerpakai);
+router.put("/Trteknis/updateEvidentbyid/:logistikType/:logistikdate/:logistikNumber/:id", upload.any(), updateTrTeknisEvidentById);
 
 
 
