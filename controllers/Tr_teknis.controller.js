@@ -454,16 +454,13 @@ const updateTrTeknisEvidentById = async (req, res) => {
 
     // Parse form data and initialize variables
     const updates = { ...req.body };
-    console.log('team before', updates.Tr_teknis_team)
     let workOrderImages = documentExists.Tr_teknis_work_order_terpakai.find(x => x.id = id);
 
     // Parse `Tr_teknis_team` and `Tr_teknis_work_order_terpakai_material`
     if (updates.Tr_teknis_team) {
       updates.Tr_teknis_team = JSON.parse(updates.Tr_teknis_team);
-    console.log('team middle', updates.Tr_teknis_team)
     updates.Tr_teknis_team = JSON.parse(updates.Tr_teknis_team);
     }
-    console.log('team after', updates.Tr_teknis_team)
     if (updates.Tr_teknis_work_order_terpakai_material) {
       updates.Tr_teknis_work_order_terpakai_material = JSON.parse(
         updates.Tr_teknis_work_order_terpakai_material
@@ -534,7 +531,6 @@ const updateTrTeknisEvidentById = async (req, res) => {
       } else if (updates[key] === '' || updates[key] === null) {
         workOrderImages.Tr_teknis_work_order_images[key] = '';
       } else if (updates[key] instanceof Array) {
-        console.log(key, updates[key])
         workOrderImages.Tr_teknis_work_order_images[key] = updates[key][0];
       }
       delete updates[key]
@@ -552,7 +548,6 @@ const updateTrTeknisEvidentById = async (req, res) => {
         ...Object.entries(updates).reduce((acc, [key, value]) => {
           // Avoid overwriting the _id field
           if (key !== "_id" && key !== "Tr_teknis_work_order_images") {
-            console.log(key, value)
             acc[`Tr_teknis_work_order_terpakai.$[elem].${key}`] = value;
           }
           return acc;

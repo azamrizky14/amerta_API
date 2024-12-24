@@ -10,7 +10,7 @@ const ItemSchema = mongoose.Schema(
     },
     item_tipe: {
       type: String,
-      enum: ['material', 'aset']
+      // enum: ['material', 'aset']
     },
     item_satuan: {
       type: String,
@@ -30,10 +30,6 @@ const ItemSchema = mongoose.Schema(
     },
     item_brand: {
       type: String,
-    },
-    item_anjing: {
-      type: Object,
-      default: {}
     },
     item_konversi: {
       type: Array,

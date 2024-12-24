@@ -26,10 +26,12 @@ const getMasterItemByItemSatuan = async (req, res) => {
   }
 };
 // FIND ONE BY ID
-const getMasterItemid = async (req, res) => {
+const getMasterItemId = async (req, res) => {
   try {
     const { id } = req.params;
-    const MasterItem = await Item.findById(id);
+    const filter = {_id: id}
+
+    const MasterItem = await Item.findById(filter);
     res.status(200).json(MasterItem);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -55,6 +57,7 @@ const createMasterItem = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 // TRIAL CREATE WITH GAMBAR 
 const createMasterItemGambar = async (req, res) => {
   try {
@@ -74,7 +77,7 @@ const createMasterItemGambar = async (req, res) => {
       throw new Error('Invalid JSON format in input');
     }
 
-    if (req.file) {
+    if (req.file && req.file.fieldname === 'item_gambar') {
       newData.item_gambar = req.file.filename;
     }
     newData.item_detail = {item_detail_stock: []}
@@ -86,6 +89,55 @@ const createMasterItemGambar = async (req, res) => {
   }
 };
 
+const updateMasterItemGambar = async (req, res) => {
+  try {
+    const { id } = req.params; // The ID of the item to update
+    const { item_id, item_gambar, ...dynamicFields } = req.body;
+
+    // Find the existing item
+    const existingItem = await Item.findById(id);
+    if (!existingItem) {
+      return res.status(404).json({ message: 'Data Item not found' });
+    }
+
+    // Check if the `item_id` has changed
+    if (item_id && item_id !== existingItem.item_id) {
+      // Check if the new `item_id` is already used
+      const itemWithSameId = await Item.findOne({ item_id });
+      if (itemWithSameId) {
+        return res.status(400).json({ message: 'Kode Item Telah Digunakan' });
+      }
+      // Update `item_id` if it's not already used
+      existingItem.item_id = item_id;
+    }
+
+    // Update dynamic fields
+    Object.keys(dynamicFields).forEach((key) => {
+      try {
+        // Attempt to parse JSON fields, fallback to raw data if parsing fails
+        existingItem[key] = JSON.parse(dynamicFields[key]);
+      } catch {
+        existingItem[key] = dynamicFields[key];
+      }
+    });
+
+    // Update image if a new one is uploaded
+    if (req.file && req.file.fieldname === 'item_gambar') {
+      existingItem.item_gambar = req.file.filename;
+    }
+
+    // Optional: Update other fields like `item_detail` if needed
+    existingItem.item_detail = existingItem.item_detail || { item_detail_stock: [] };
+
+    // Save the updated item
+    await existingItem.save();
+
+    res.status(200).json({ message: 'Data Item Updated', data: existingItem });
+  } catch (error) {
+    console.error('Failed to update data', error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // Create existing item untuk penambahan stok dll 
 const createMasterItemExisting = async (req, res) => {
@@ -135,24 +187,6 @@ const createMasterItemExisting = async (req, res) => {
     // res.status(200).json(updatedMasterItem)
   } catch (error) {
     res.status(500).json({ message: error.message })
-  }
-};
-// updated masterItem with gambar 
-const updateMasterItemGambar = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { item_gambar, ...dynamicFields } = req.body;
-    // const newData = new Item({ ...dynamicFields, item_gambar: req.file.filename });
-    const MasterItem = await Item.findByIdAndUpdate(id, { item_gambar: req.file.filename, ...dynamicFields });
-
-    if (!MasterItem) {
-      return res.status(404).json({ message: "MasterItem not found" });
-    }
-
-    const updatedMasterItem = await Item.findById(id);
-    res.status(200).json(updatedMasterItem);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
 };
 // Updated MasterItem 
@@ -314,7 +348,7 @@ const updatedMasterItemHistoryByNametrial = async (req, res) => {
 module.exports = {
   getMasterItem,
   getMasterItemByItemSatuan,
-  getMasterItemid,
+  getMasterItemId,
   getMasterItemName,
   createMasterItem,
   createMasterItemGambar,

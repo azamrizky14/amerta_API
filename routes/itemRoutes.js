@@ -7,7 +7,7 @@ const itemController = require("../controllers/itemController");
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         // cb(null, '../uploads/') // Destinasi diluar project api & front-end
-        cb(null, './images/admin_logistik') // Destinasi didalam project back end
+        cb(null, './images/master_item') // Destinasi didalam project back end
     },
     filename: function (req, file, cb) {
         // Rename the file to avoid conflicts
@@ -17,9 +17,14 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 // GET
 router.get("/getAllItem/:domain/:deleted?", itemController.getMasterItem);
+router.get("/getItemById/:id", itemController.getMasterItemId);
 
 // POST
-router.post("/createImage", upload.single('item_gambar'), itemController.createMasterItemGambar);
+router.post("/createImage", upload.any(), itemController.createMasterItemGambar);
+
+// UPDATE
+router.put("/updateImage/:id", upload.any(), itemController.updateMasterItemGambar);
+
 
 
 // update a product
