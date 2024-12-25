@@ -30,10 +30,9 @@ const getTrTeknis = async (req, res) => {
   }
 };
 
-// GET BY DOMAIN
 const getTrTeknisEvident = async (req, res) => {
   try {
-    const { domain, deleted, type, status } = req.params;
+    const { domain, deleted, type, status, createdStart, createdEnd } = req.params;
 
     // Create a filter object dynamically
     const filter = { Tr_teknis_domain: domain };
@@ -43,8 +42,15 @@ const getTrTeknisEvident = async (req, res) => {
     if (type) filter.Tr_teknis_jenis = type;
     if (status) filter.Tr_teknis_status = status;
 
-    // Fetch the data based on the dynamic filter
-    const TrTeknis = await Tr_teknis.find(filter);
+    // Add filter for Tr_teknis_created if start and/or end dates are provided
+    if (createdStart || createdEnd) {
+      filter.Tr_teknis_created = {};
+      if (createdStart) filter.Tr_teknis_created.$gte = new Date(createdStart);
+      if (createdEnd) filter.Tr_teknis_created.$lte = new Date(createdEnd);
+    }
+
+    // Fetch the data based on the dynamic filter and sort by Tr_teknis_created
+    const TrTeknis = await Tr_teknis.find(filter).sort({ Tr_teknis_created: -1 }); // Sort by newest date
 
     // Check if any data was found
     if (TrTeknis.length > 0) {
@@ -53,8 +59,15 @@ const getTrTeknisEvident = async (req, res) => {
         (item) => item.Tr_teknis_work_order_terpakai || []
       );
 
-      const reversedData = combinedResult.reverse();
-      return res.status(200).json(reversedData);
+      // const reversedData = combinedResult.reverse();
+      // Sort the combinedResult by Tr_teknis_created (newest to latest)
+      const sortedResult = combinedResult.sort((a, b) => {
+        const dateA = new Date(a.Tr_teknis_created);
+        const dateB = new Date(b.Tr_teknis_created);
+        return dateB - dateA; // Sort descending
+      });
+
+      return res.status(200).json(sortedResult);
     } else {
       return res.status(404).json({ message: "DATA KOSONG" });
     }
@@ -63,6 +76,7 @@ const getTrTeknisEvident = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
 
 // FIND ONE BY ID
 const getTrTeknisById = async (req, res) => {

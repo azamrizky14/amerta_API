@@ -28,7 +28,6 @@
     const userInternal = require("./routes/userInternalRoutes.js");
     const utilities = require("./routes/utilitiesRoutes.js");
     const Item = require("./routes/itemRoutes.js");
-    const role = require("./routes/roleRoutes.js");
     const cors = require("cors")
     const path = require("path");
 
@@ -68,7 +67,6 @@
     app.use("/api/userInternal", userInternal)
     app.use("/api/utilities", utilities)
     app.use("/api/item", Item);
-    app.use("/api/role", role)
 
 
 

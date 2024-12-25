@@ -8,10 +8,7 @@ const userInternalSchema = new mongoose.Schema({
   // For example:
   companyCode: {
     type: Array,
-    // require: true
-  },
-  companyName: {
-    type: String,
+    require: true
   },
   companyName: {
     type: String
