@@ -193,6 +193,8 @@ const createTrTeknisGambar = async (req, res) => {
     const imageFieldMapping = {
       PSB: [
         "Tr_teknis_evident_progress",
+        "Tr_teknis_evident_ont_depan",
+        "Tr_teknis_evident_ont_belakang",
         "Tr_teknis_evident_odp_depan",
         "Tr_teknis_evident_odp_dalam",
         "Tr_teknis_evident_redaman_ont",
@@ -317,6 +319,8 @@ const updateTrTeknisWorkOrderTerpakai = async (req, res) => {
     const imageFieldMapping = {
       PSB: [
         "Tr_teknis_evident_progress",
+        "Tr_teknis_evident_ont_depan",
+        "Tr_teknis_evident_ont_belakang",
         "Tr_teknis_evident_odp_depan",
         "Tr_teknis_evident_odp_dalam",
         "Tr_teknis_evident_redaman_ont",
