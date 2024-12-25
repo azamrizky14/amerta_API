@@ -148,7 +148,7 @@ async function createUser(req, res) {
       data.imageName = req.file.originalname; // Store file name
     }
     data.userAccess = JSON.parse(data.userAccess);
-    // data.companyCode = JSON.parse(data.companyCode);
+    data.companyCode = JSON.parse(data.companyCode);
     // Create a new company based on the modified data
     const newCompany = await UserInternal.create(data);
     res.status(201).json(newCompany);
