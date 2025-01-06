@@ -29,8 +29,14 @@ async function getAllUsers(req, res) {
 async function getUserByRole(req, res) {
   try {
     const { companyName, userRole } = req.params;
+    
+    const filter = { isDeleted: false, companyName: companyName };
+
+    // Add optional filters if provided
+    if (userRole) filter.userRole = userRole;
+
     // Retrieve all users from the database
-    const users = await UserInternal.find({ isDeleted: false, userRole: userRole, companyName: companyName });
+    const users = await UserInternal.find(filter);
     res.json(users);
   } catch (error) {
     console.error("Error fetching users:", error);

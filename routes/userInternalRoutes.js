@@ -8,7 +8,7 @@ const upload = require('../utils/multerConfig'); // Adjust the path as necessary
 // GET ROUTER
 router.get("/detail/:userId", userInternalController.getUserById);
 router.get("/", userInternalController.getAllUsers);
-router.get("/getUserByRole/:companyName/:userRole", userInternalController.getUserByRole);
+router.get("/getUserByRole/:companyName/:userRole?", userInternalController.getUserByRole);
 
 // POST ROUTER
 router.post("/create", upload.single('userImage'), userInternalController.createUser)
