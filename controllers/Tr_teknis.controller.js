@@ -473,7 +473,7 @@ const updateTrTeknisEvidentById = async (req, res) => {
     // Parse `Tr_teknis_team` and `Tr_teknis_work_order_terpakai_material`
     if (updates.Tr_teknis_team) {
       updates.Tr_teknis_team = JSON.parse(updates.Tr_teknis_team);
-    updates.Tr_teknis_team = JSON.parse(updates.Tr_teknis_team);
+      if (typeof updates.Tr_teknis_team === String) updates.Tr_teknis_team = JSON.parse(updates.Tr_teknis_team);
     }
     if (updates.Tr_teknis_work_order_terpakai_material) {
       updates.Tr_teknis_work_order_terpakai_material = JSON.parse(
@@ -487,6 +487,8 @@ const updateTrTeknisEvidentById = async (req, res) => {
         "Tr_teknis_evident_progress",
         "Tr_teknis_evident_odp_depan",
         "Tr_teknis_evident_odp_dalam",
+        "Tr_teknis_evident_ont_depan",
+        "Tr_teknis_evident_ont_belakang",
         "Tr_teknis_evident_redaman_ont",
         "Tr_teknis_evident_redaman_odp",
         "Tr_teknis_evident_marking_dc_start",
@@ -601,6 +603,8 @@ const updateTrTeknisGambar = async (req, res) => {
         "Tr_teknis_evident_progress",
         "Tr_teknis_evident_odp_depan",
         "Tr_teknis_evident_odp_dalam",
+        "Tr_teknis_evident_ont_depan",
+        "Tr_teknis_evident_ont_belakang",
         "Tr_teknis_evident_redaman_ont",
         "Tr_teknis_evident_redaman_odp",
         "Tr_teknis_evident_marking_dc_start",

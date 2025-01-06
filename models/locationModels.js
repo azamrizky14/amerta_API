@@ -15,7 +15,7 @@ const LocationSchema = mongoose.Schema(
     lokasi_alamat: {
       type: String,
     },
-    lokasi_keterangan: {
+    lokasi_keterangan: { 
       type: String,
     },
     lokasi_detail: {
@@ -44,6 +44,6 @@ const LocationSchema = mongoose.Schema(
 );
 
 
-const Item = mongoose.model("item", LocationSchema);
+const Location = mongoose.model("lokasi", LocationSchema);
 
-module.exports = Item;
+module.exports = Location;
