@@ -13,14 +13,14 @@ const LocationSchema = mongoose.Schema(
       // enum: ['gudang', 'ruang', 'rak']
     },
     lokasi_alamat: {
-      type: String,
+      type: Object,
     },
     lokasi_keterangan: { 
       type: String,
     },
     lokasi_detail: {
       type: Object,
-      default: {}, // Optional: Provide a default value
+      default: {}, // Optional: Provide a default value 
     },
     lokasi_user_created: {
       type: String,
