@@ -17,14 +17,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 // GET
 router.get("/getAllLocation/:domain/:deleted?", locationController.getMasterLocation);
-router.get("/getItemById/:id", locationController.getMasterLocationId);
+router.get("/getLocationById/:id", locationController.getMasterLocationId);
+router.get('/getLocationByType/:company/:jenis/:alamat?', locationController.getLocationByTipe);
 
 // POST
 router.post("/create", locationController.createMasterLocation);
 
 
 // UPDATE
-
+router.put("/update/:id", locationController.updateMasterLocation);
 
 
 // update a product
